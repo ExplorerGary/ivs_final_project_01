@@ -6,7 +6,8 @@ import { Container, Row, Col } from 'react-bootstrap';
 import OwnBarChart from '@/components/myOwnBarChart';
 import OwnPieChart from '@/components/myOwnPieChart';
 
-const csvPath = '/data/Nezha2_fin.csv';
+// const csvPath = '/data/Nezha2_fin.csv';
+const csvPath = '/data/Nezha2_neo_building_clouds.csv'
 
 function useData(csvPath) {
   const [dataAll, setData] = React.useState(null);
@@ -44,27 +45,52 @@ const Charts = () => {
     setSentimentIndex(newIndex);
     setHasFiltered(true); // 标记用户已操作
   };
+//按情绪取得
   const getWordCloudImagePath0 = () => {
     if (hasFiltered && typeof sentimentIndex === 'number') {
       return `/data/Gender0Sentiment${sentimentIndex}.png`;
     } else {
-      return `/data/sampleCloud.png`;
+      return `/data/Gender0SentimentG.png`;
     }
   };
   const getWordCloudImagePath1 = () => {
     if (hasFiltered && typeof sentimentIndex === 'number') {
       return `/data/Gender1Sentiment${sentimentIndex}.png`;
     } else {
-      return `/data/sampleCloud.png`;
+      return `/data/Gender1SentimentG.png`;
     }
   };
   const getWordCloudImagePath2 = () => {
     if (hasFiltered && typeof sentimentIndex === 'number') {
       return `/data/Gender2Sentiment${sentimentIndex}.png`;
     } else {
-      return `/data/sampleCloud.png`;
+      return `/data/Gender2SentimentG.png`;
     }
   };
+
+
+  // 按分数取得：
+  // const getWordCloudImagePath0 = () => {
+  //   if (hasFiltered && typeof sentimentIndex === 'number') {
+  //     return `/data/Gender0Score${sentimentIndex}.png`;
+  //   } else {
+  //     return `/data/sampleCloud.png`;
+  //   }
+  // };
+  // const getWordCloudImagePath1 = () => {
+  //   if (hasFiltered && typeof sentimentIndex === 'number') {
+  //     return `/data/Gender1Score${sentimentIndex}.png`;
+  //   } else {
+  //     return `/data/sampleCloud.png`;
+  //   }
+  // };
+  // const getWordCloudImagePath2 = () => {
+  //   if (hasFiltered && typeof sentimentIndex === 'number') {
+  //     return `/data/Gender2Score${sentimentIndex}.png`;
+  //   } else {
+  //     return `/data/sampleCloud.png`;
+  //   }
+  // };  
   // 决定过滤逻辑
   let filteredData = dataAll;
   if (hasFiltered) {
@@ -142,16 +168,16 @@ const Charts = () => {
           </div>
 
           {/* 两个小图平排 */}
-          <div className="d-flex gap-3" style={{ flex: 1 }}>
+          <div className="d-flex gap-3" style={{ flex: 2 }}>
             <img
               src={getWordCloudImagePath1()}
               alt="Male Cloud"
-              style={{ background: '#ccc', flex: 1, width: '100%', maxHeight: '300px' }}
+              style={{ background: '#ccc', flex: 2, width: '100%', maxHeight: '300px' }}
             />
             <img
               src={getWordCloudImagePath2()}
               alt="Female Cloud"
-              style={{ background: '#ccc', flex: 1, width: '100%', maxHeight: '300px' }}
+              style={{ background: '#ccc', flex: 2, width: '100%', maxHeight: '300px' }}
             />
           </div>
         </Col>

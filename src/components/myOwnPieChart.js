@@ -33,6 +33,8 @@ function OwnPieChart({ dataAll, sentimentIndex }) {
 
     // 计算每个情绪的数量
     const sentimentCounts = Array(SENTIMENT_LABELS.length).fill(0);
+//
+//
     dataAll.forEach(d => {
       const value = d.sentiment;
       for (let i = 0; i < SENTIMENT_RANGES.length; i++) {
@@ -82,6 +84,39 @@ function OwnPieChart({ dataAll, sentimentIndex }) {
         .attr('fill', 'black')
         .style('font-size', '10px')
         .text(label);
+      // how many
+      const totalCount = sentimentCounts.reduce((a, b) => a + b, 0);
+
+      const summaryRow = legend.append('g')
+        .attr('transform', `translate(0, ${SENTIMENT_LABELS.length * 18 + 8})`);
+
+      let summaryText = '';
+
+      if (
+        typeof sentimentIndex === 'number' &&
+        sentimentIndex >= 0 &&
+        sentimentIndex < sentimentCounts.length
+      ) {
+        const highlightedCount = sentimentCounts[sentimentIndex];
+        const percentage = totalCount > 0 ? ((highlightedCount / totalCount) * 100).toFixed(1) : 0;
+        summaryText = `Num of ${SENTIMENT_LABELS[sentimentIndex]}: \n${highlightedCount} people \n(${percentage}%)`;
+      }
+      summaryRow.append('text')
+        .attr('x', 0)
+        .attr('y', 10)
+        .attr('fill', 'black')
+        .style('font-size', '10px')
+        .style('opacity', summaryText ? 1 : 0)
+        .selectAll('tspan')
+        .data(summaryText ? summaryText.split('\n') : [])
+        .enter()
+        .append('tspan')
+        .attr('x', 0)
+        .attr('dy', (d, i) => i === 0 ? 0 : 12) 
+        .text(d => d);
+
+
+
     });
 
   }, [dataAll, sentimentIndex]);
