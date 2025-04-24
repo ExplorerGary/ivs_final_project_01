@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { Container, Row, Col } from 'react-bootstrap';
 import OwnBarChart from '@/components/myOwnBarChart';
 import OwnPieChart from '@/components/myOwnPieChart';
+
 const csvPath = '/data/Nezha2_fin.csv';
 
 function useData(csvPath) {
@@ -27,7 +28,6 @@ const Charts = () => {
   const [sentimentIndex, setSentimentIndex] = React.useState("General"); // 初始情感 index（可任意）
   const [hasFiltered, setHasFiltered] = React.useState(false);   // 是否已手动选择情感区间
   const dataAll = useData(csvPath);
-
   const SENTIMENT_LABELS = ['Disgusted', 'Dissatisfied', 'Indifferent', 'Satisfied', 'Delighted'];
   const SENTIMENT_RANGES = [
     [0.0, 0.2],
@@ -44,7 +44,27 @@ const Charts = () => {
     setSentimentIndex(newIndex);
     setHasFiltered(true); // 标记用户已操作
   };
-
+  const getWordCloudImagePath0 = () => {
+    if (hasFiltered && typeof sentimentIndex === 'number') {
+      return `/data/Gender0Sentiment${sentimentIndex}.png`;
+    } else {
+      return `/data/sampleCloud.png`;
+    }
+  };
+  const getWordCloudImagePath1 = () => {
+    if (hasFiltered && typeof sentimentIndex === 'number') {
+      return `/data/Gender1Sentiment${sentimentIndex}.png`;
+    } else {
+      return `/data/sampleCloud.png`;
+    }
+  };
+  const getWordCloudImagePath2 = () => {
+    if (hasFiltered && typeof sentimentIndex === 'number') {
+      return `/data/Gender2Sentiment${sentimentIndex}.png`;
+    } else {
+      return `/data/sampleCloud.png`;
+    }
+  };
   // 决定过滤逻辑
   let filteredData = dataAll;
   if (hasFiltered) {
@@ -104,8 +124,8 @@ const Charts = () => {
             <OwnPieChart dataAll={dataAll} sentimentIndex = {sentimentIndex}/>
           </div>
           <img
-            src="/data/sampleCloud.png"
-            alt="Sample Cloud"
+            src={getWordCloudImagePath0()}
+            alt="Unknown Cloud"
             style={{ background: '#ccc', flex: 1, width: '100%', maxHeight: '300px' }}
           />
         </Col>
@@ -116,7 +136,7 @@ const Charts = () => {
           <div style={{ flex: 2 }}>
             <img
                 src="https://lh6.googleusercontent.com/proxy/yulo1A6L-rFNsolVhTJQTf5eMdcS90JNQcXe8QG9O_NhLrXslg2kN-boRkP_gb0XFHMmoQcs1LdNv5xSeEvbEq3PC3iyim8"
-                alt="Sample Cloud"
+                alt="Sample Map"
                 style={{ background: '#ccc', flex: 2, width: '50%', maxHeight: '100%' }}
               />
           </div>
@@ -124,13 +144,13 @@ const Charts = () => {
           {/* 两个小图平排 */}
           <div className="d-flex gap-3" style={{ flex: 1 }}>
             <img
-              src="/data/sampleCloud.png"
-              alt="Sample Cloud"
+              src={getWordCloudImagePath1()}
+              alt="Male Cloud"
               style={{ background: '#ccc', flex: 1, width: '100%', maxHeight: '300px' }}
             />
             <img
-              src="/data/sampleCloud.png"
-              alt="Sample Cloud"
+              src={getWordCloudImagePath2()}
+              alt="Female Cloud"
               style={{ background: '#ccc', flex: 1, width: '100%', maxHeight: '300px' }}
             />
           </div>
