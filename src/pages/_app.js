@@ -138,7 +138,7 @@ const Charts = () => {
             <img
               src={getWordCloudImagePath(gender)} // Using gender in the path
               alt="WordCloud"
-              style={{ background: '#ccc', width: '100%', maxHeight: '300px', height: 'auto' }}
+              style={{ background: '#ccc', width: '100%', maxHeight: '600px', height: 'auto' }}
             />
           </div>
         </Col>
