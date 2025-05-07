@@ -1,8 +1,7 @@
-
 import React from 'react';
 import * as d3 from "d3";
 import 'bootstrap/dist/css/bootstrap.css';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import OwnBarChart from '@/components/myOwnBarChart';
 import OwnPieChart from '@/components/myOwnPieChart';
 
@@ -26,8 +25,9 @@ function useData(csvPath) {
 }
 
 const Charts = () => {
-  const [sentimentIndex, setSentimentIndex] = React.useState("General"); // 初始情感 index（可任意）
-  const [hasFiltered, setHasFiltered] = React.useState(false);   // 是否已手动选择情感区间
+  const [sentimentIndex, setSentimentIndex] = React.useState("General");
+  const [hasFiltered, setHasFiltered] = React.useState(false);
+  const [gender, setGender] = React.useState(0); // Added gender state
   const dataAll = useData(csvPath);
   const SENTIMENT_LABELS = ['Disgusted', 'Dissatisfied', 'Indifferent', 'Satisfied', 'Delighted'];
   const SENTIMENT_RANGES = [
@@ -39,75 +39,32 @@ const Charts = () => {
   ];
   if (!dataAll) return <pre>📦 正在加载数据...</pre>;
 
-  // 滑动条触发函数：设置情感 index，并标记为已过滤
   const handleSentimentChange = (e) => {
     const newIndex = +e.target.value;
     setSentimentIndex(newIndex);
-    setHasFiltered(true); // 标记用户已操作
+    setHasFiltered(true);
   };
-//按情绪取得
-  const getWordCloudImagePath0 = () => {
-    if (hasFiltered && typeof sentimentIndex === 'number') {
-      return `/data/Gender0Sentiment${sentimentIndex}.png`;
-    } else {
-      return `/data/Gender0SentimentG.png`;
-    }
+
+  const handleGenderChange = (newGender) => { // Handler for gender button click
+    setGender(newGender);
   };
-  const getWordCloudImagePath1 = () => {
+
+  const getWordCloudImagePath = (gender) => {
     if (hasFiltered && typeof sentimentIndex === 'number') {
-      return `/data/Gender1Sentiment${sentimentIndex}.png`;
+      return `/data/neo_wordcloud/Gender${gender}Sentiment${sentimentIndex}.png`;
     } else {
-      return `/data/Gender1SentimentG.png`;
-    }
-  };
-  const getWordCloudImagePath2 = () => {
-    if (hasFiltered && typeof sentimentIndex === 'number') {
-      return `/data/Gender2Sentiment${sentimentIndex}.png`;
-    } else {
-      return `/data/Gender2SentimentG.png`;
+      return `/data/neo_wordcloud/Gender${gender}SentimentG.png`;
     }
   };
 
-
-  // 按分数取得：
-  // const getWordCloudImagePath0 = () => {
-  //   if (hasFiltered && typeof sentimentIndex === 'number') {
-  //     return `/data/Gender0Score${sentimentIndex}.png`;
-  //   } else {
-  //     return `/data/sampleCloud.png`;
-  //   }
-  // };
-  // const getWordCloudImagePath1 = () => {
-  //   if (hasFiltered && typeof sentimentIndex === 'number') {
-  //     return `/data/Gender1Score${sentimentIndex}.png`;
-  //   } else {
-  //     return `/data/sampleCloud.png`;
-  //   }
-  // };
-  // const getWordCloudImagePath2 = () => {
-  //   if (hasFiltered && typeof sentimentIndex === 'number') {
-  //     return `/data/Gender2Score${sentimentIndex}.png`;
-  //   } else {
-  //     return `/data/sampleCloud.png`;
-  //   }
-  // };  
-  // 决定过滤逻辑
   let filteredData = dataAll;
   if (hasFiltered) {
     const [min, max] = SENTIMENT_RANGES[sentimentIndex];
     filteredData = dataAll.filter(d => d.sentiment >= min && d.sentiment < max);
-    console.log(`✅ 当前选择的情感区间: [${min}, ${max})`);
-    console.log(`✅ 当前选择的情感idx： ${sentimentIndex} `);
-  } else {
-    console.log(`🌐 初始状态，显示全部数据，共 ${dataAll.length} 条`);
-    console.log(`✅ 当前选择的情感idx： ${sentimentIndex} `);
   }
-
-  console.log(filteredData); // 控制台输出最终使用的数据
 
   return (
     <Container fluid className="p-4">
-      {/* 顶部标题 */}
       <Row className="mb-2">
         <Col>
           <h1>Sentiment Analysis on: Nezha: The Devil Boy Churns the Sea</h1>
@@ -118,10 +75,9 @@ const Charts = () => {
           <p style={{ fontSize: '1.2rem', color: '#555' }}>Top Concerns and Geo Distribution</p>
         </Col>
       </Row>
-  
       <Row style={{ height: '80vh' }}>
 
-        {/* 左侧滑动条 */}
+        {/* Left column: sliding bar */}
         <Col xs={12} md={1} className="d-flex flex-column align-items-center" style={{ minWidth: '100px', height: '100%' }}>
           <h5 className="mb-3">{sentimentIndex !== "General" ? SENTIMENT_LABELS[sentimentIndex] : "General"}</h5>
           <input
@@ -133,56 +89,56 @@ const Charts = () => {
             className="form-range"
             style={{
               writingMode: 'bt-lr',
-              height: '100%',         // 滑动条高度填满父容器
+              height: '100%',
               transform: 'rotate(270deg)',
-              width: '500px',          // 固定宽度
-              maxWidth: '200%'        // 最大宽度 100%
+              width: '500px',
+              maxWidth: '200%'
             }}
           />
         </Col>
 
-        {/* 中间三图（垂直） */}
+        {/* Middle column: Pie and Bar charts */}
         <Col xs={12} md={3} className="d-flex flex-column gap-3" style={{ minWidth: '200px' }}>
           <div style={{ flex: 2 }}>
             <OwnBarChart filteredData={filteredData} />
           </div>
           <div style={{ flex: 2 }}>
-            <OwnPieChart dataAll={dataAll} sentimentIndex = {sentimentIndex}/>
+            <OwnPieChart dataAll={dataAll} sentimentIndex={sentimentIndex} />
           </div>
-          <img
-            src={getWordCloudImagePath0()}
-            alt="Unknown Cloud"
-            style={{ background: '#ccc', flex: 1, width: '100%', maxHeight: '300px' }}
-          />
         </Col>
 
-        {/* 右侧图：1 大图 + 2 小图并排 */}
-        <Col xs={12} md={8} className="d-flex flex-column gap-3" style={{ minWidth: '300px' }}>
-          {/* 大图占两行 */}
+        {/* Middle column2: GeoMap */}
+        <Col xs={12} md={4} className="d-flex flex-column gap-3" style={{ minWidth: '200px' }}>
           <div style={{ flex: 2 }}>
-            <img
-                src="https://lh6.googleusercontent.com/proxy/yulo1A6L-rFNsolVhTJQTf5eMdcS90JNQcXe8QG9O_NhLrXslg2kN-boRkP_gb0XFHMmoQcs1LdNv5xSeEvbEq3PC3iyim8"
-                alt="Sample Map"
-                style={{ background: '#ccc', flex: 2, width: '50%', maxHeight: '100%' }}
-              />
+            <img src = "https://lh6.googleusercontent.com/proxy/yulo1A6L-rFNsolVhTJQTf5eMdcS90JNQcXe8QG9O_NhLrXslg2kN-boRkP_gb0XFHMmoQcs1LdNv5xSeEvbEq3PC3iyim8"></img>
+          </div>
+        </Col>
+
+
+
+
+        {/* Right column: Word cloud with gender selection */}
+        <Col xs={12} md={4} className="d-flex flex-column gap-3" style={{ minWidth: '300px' }}>
+          {/* Gender Buttons */}
+          <div style={{ marginBottom: '10px' }}>
+            <Button onClick={() => handleGenderChange(0)} variant={gender === 0 ? 'primary' : 'secondary'}>Male</Button>
+            <Button onClick={() => handleGenderChange(1)} variant={gender === 1 ? 'primary' : 'secondary'}>Female</Button>
+            <Button onClick={() => handleGenderChange(2)} variant={gender === 2 ? 'primary' : 'secondary'}>Other</Button>
           </div>
 
-          {/* 两个小图平排 */}
-          <div className="d-flex gap-3" style={{ flex: 2 }}>
+          {/* Word cloud */}
+          <div style={{ flex: 1 }}>
             <img
-              src={getWordCloudImagePath1()}
-              alt="Male Cloud"
-              style={{ background: '#ccc', flex: 2, width: '100%', maxHeight: '300px' }}
-            />
-            <img
-              src={getWordCloudImagePath2()}
-              alt="Female Cloud"
-              style={{ background: '#ccc', flex: 2, width: '100%', maxHeight: '300px' }}
+              src={getWordCloudImagePath(gender)} // Using gender in the path
+              alt="WordCloud"
+              style={{ background: '#ccc', width: '100%', maxHeight: '300px' }}
             />
           </div>
         </Col>
       </Row>
     </Container>
   );
-}  
+};
+
 export default Charts;
+
